@@ -61,7 +61,7 @@ function run() {
       q[1] = q[0];
     }
 
-    var real = q[1] = q[2] * cos;
+    var real = q[1] - q[2] * cos;
     var imag = q[2] * sin;
     var magnitude = Math.pow(real,2) + Math.pow(imag, 2);
 
