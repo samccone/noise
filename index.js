@@ -12,16 +12,17 @@ var processData = [];
 var k;
 var x = 0;
 
-function paint(d) {
+function paint(d, m) {
   ctx.beginPath();
 
   for(var i = 0; i < d.length; ++i) {
-    ctx.lineTo(x+i/2, 100+d[i]*20, 1, 1);
+    ctx.lineTo(x+i/4, 100+d[i]*20, 1, 1);
   }
-  x+= d.length/2;
+  x+= d.length/4;
 
   ctx.stroke();
   ctx.closePath();
+  ctx.fillRect(x, m, 10, 10);
 }
 
 function run() {
@@ -38,10 +39,14 @@ function run() {
 
   osc = context.createOscillator();
   processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
+  osc.connect(processor);
+  osc.connect(context.destination);
+  processor.connect(context.destination);
+
   processor.onaudioprocess = function(e) {
     var q = [0,0,0];
     processData = e.inputBuffer.getChannelData(0);
-    paint(processData);
+
     for(var i =0; i< bufferFrameSize; i++) {
       var w = 2*i/bufferFrameSize;
       cos = Math.cos(w);
@@ -55,6 +60,8 @@ function run() {
     var real = q[1] - q[2] * cos;
     var imag = q[2] * sin;
     var magnitude = Math.pow(real,2) + Math.pow(imag, 2);
+    console.log("!");
+    paint(Array.prototype.slice.call(processData, 0), magnitude);
 
     out.push({
       real: real,
@@ -66,21 +73,14 @@ function run() {
   while(i++ < data.length) {
     osc.frequency.setValueAtTime(data[i] == '1' ? mark+shift : mark, i*length+context.currentTime);
   }
-  osc.frequency.value = mark;
-
-  osc.connect(processor);
-  osc.connect(context.destination);
-  processor.connect(context.destination);
 
   osc.start();
+  osc.frequency.value = 0;
 
   osc.stop(data.length*length+context.currentTime);
   lastTime = data.length*length;
 
   osc.onended = function() {
-    for(var v=0;v<out.length;++v) {
-      ctx.fillRect(v*4, out[v].magnitude, 2, 2);
-    }
     osc.disconnect(processor);
     osc.disconnect(context.destination);
     processor.disconnect(context.destination);
