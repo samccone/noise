@@ -1,19 +1,23 @@
-var bufferFrameSize = 4096;
+var bufferFrameSize = 256;
 var context = new (window.AudioContext || window.webkitAudioContext);
 
-var data = '0100100001100101011011000110110001101111001000010010000001101101011110010010000001101110011000010110110101100101001000000110100101110011001000000111001101100001011011010010000001110011011000010110001101100011011011110110111001100101001000000110100001101111011101110010000001100001011100100110010100100000011110010110111101110101';
+var data = '10';
 
 var lastTime = 0;
 var out = [];
 var ctx = document.querySelector('canvas').getContext('2d');
 var processData = [];
+var k;
 
 (function() {
-  ctx.clearRect(0,0, 2048, 200);
+  //ctx.clearRect(0,0, 2048, 200);
   ctx.beginPath();
 
   for(var i = 0; i < processData.length; ++i) {
-    ctx.lineTo(i/2, 100+processData [i]*20, 1, 1);
+    if (i%17 == 0) {
+      ctx.fillRect(i/2, 65, 2, 2);
+    }
+    ctx.lineTo(i/2, 100+processData[i]*20, 1, 1);
   }
 
   ctx.stroke()
@@ -36,23 +40,36 @@ function run() {
   var shift = parseInt(document.querySelector('[name="shift"]').value)
     || 1000
 
+
+  k = 0.5 + (bufferFrameSize * (mark+shift) / 44100)
+
   length = 1/baud;
 
   osc = context.createOscillator();
   processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
-
   processor.onaudioprocess = function(e) {
+    console.log("tick");
+    var q = [0,0,0];
     processData = e.inputBuffer.getChannelData(0);
-    var sectionSum = 0;
-    var prevSectionSum = 0;
-     for(var i =0; i< 400; i+=4) {
-      sectionSum+= Math.abs(processData[i]);
-       if (i%((sampleRate/baud)/1) == 0) {
-        out.push(sectionSum);
-        prevSectionSum = sectionSum;
-        sectionSum = 0;
-      }
+    for(var i =0; i< bufferFrameSize; i++) {
+      var w = 2*i/bufferFrameSize;
+      cos = Math.cos(w);
+      sin = Math.sin(w)
+      coeff = 2 * cos;
+      q[0] = coeff * q[1] - q[2] + processData[i];
+      q[2] = q[1];
+      q[1] = q[0];
     }
+
+    var real = q[1] = q[2] * cos;
+    var imag = q[2] * sin;
+    var magnitude = Math.pow(real,2) + Math.pow(imag, 2);
+
+    out.push({
+      real: real,
+      imag: imag,
+      magnitude: magnitude
+    })
   }
 
   while(i++ < data.length) {
@@ -70,6 +87,9 @@ function run() {
   lastTime = data.length*length;
 
   osc.onended = function() {
+    for(var v=0;v<out.length;++v) {
+      ctx.fillRect(v*4, out[v].magnitude, 2, 2);
+    }
     osc.disconnect(processor);
     osc.disconnect(context.destination);
     processor.disconnect(context.destination);
