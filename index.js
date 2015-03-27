@@ -3,7 +3,7 @@ var SampleRate = 44100;
 var Audio = (window.AudioContext || window.webkitAudioContext);
 var context = new Audio();
 
-var data = '111000111000111000111000111000111';
+var data = '01101000011001010110110001101100011011110010000001101101011110010010000001101110011000010110110101100101001000000110100101110011001000000111000001100001011101010110110000100000011010010010000001100001011011010010000001100001001000000110110101100001011011100010000001100001011011100110010000100000011010010010000001101000011000010111011001100101001000000110000100100000011011100110100101100011011001010010000001101100011010010110011001100101001000000110010001101111001000000111100101101111011101010010000001101100011010010110101101100101001000000110001101101000011001010111001101110011011001010010000001100010011001010110001101100001011101010111001101100101001000000111000001100001011101010110110000100000011001000110111101100101011100110010000001101110011011110111010000100000011010000110010100100000011010010111001100100000011001100111001001101111011011010010000001100011011000010110111001100001011001000110000100100000';
 
 var lastTime = 0;
 var out = [];
@@ -27,7 +27,6 @@ function paint(d, m) {
 
 function run() {
   var sampleRate = context.sampleRate;
-  var i=0;
 
   var baud = parseInt(document.querySelector('[name="baud"]').value);
   var mark = parseInt(document.querySelector('[name="mark"]').value);
@@ -51,11 +50,11 @@ function run() {
     remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
 
     // trim leading 0's
-    if (out.length == 0) {
-      remainder = remainder.filter(function(v){return v});
+    if (out.length === 0) {
+      remainder = remainder.filter(function(v){return v;});
     }
 
-    while(remainder.length > binsPerBit) {
+    while(remainder.length >= binsPerBit) {
       var chunk = remainder.slice(0, binsPerBit);
       remainder = remainder.slice(binsPerBit);
       var q = [0,0,0];
@@ -78,12 +77,12 @@ function run() {
       });
     }
 
-    paint(Array.prototype.slice.call(processData, 0), 0);
+    //paint(Array.prototype.slice.call(processData, 0), 0);
   };
 
-  while(i++ < data.length) {
-    osc.frequency.setValueAtTime(data[i] == '1' ? mark+shift : mark, i*length+context.currentTime);
-  }
+  data.split('').forEach(function(v, i) {
+    osc.frequency.setValueAtTime(v == '1' ? mark+shift : mark, i*length+context.currentTime);
+  });
 
   osc.start();
   osc.frequency.value = 0;
