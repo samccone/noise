@@ -1,9 +1,9 @@
-var bufferFrameSize = 256;
+var bufferFrameSize = 2048;
 var SampleRate = 44100;
 var Audio = (window.AudioContext || window.webkitAudioContext);
 var context = new Audio();
 
-var data = '111000111';
+var data = '111000111000111000111000111000111';
 
 var lastTime = 0;
 var out = [];
@@ -32,8 +32,10 @@ function run() {
   var baud = parseInt(document.querySelector('[name="baud"]').value);
   var mark = parseInt(document.querySelector('[name="mark"]').value);
   var shift = parseInt(document.querySelector('[name="shift"]').value);
+  var binsPerBit = (SampleRate/bufferFrameSize)/baud * bufferFrameSize;
+  remainder = [];
 
-  k = 0.5 + (bufferFrameSize * (mark+shift) / SampleRate);
+  k = 0.5 + (binsPerBit * (mark+shift) / SampleRate);
 
   length = 1/baud;
 
@@ -44,30 +46,39 @@ function run() {
   processor.connect(context.destination);
 
   processor.onaudioprocess = function(e) {
-    var q = [0,0,0];
     processData = e.inputBuffer.getChannelData(0);
 
-    for(var i =0; i< bufferFrameSize; i++) {
-      var w = 2*i/bufferFrameSize;
-      cos = Math.cos(w);
-      sin = Math.sin(w);
-      coeff = 2 * cos;
-      q[0] = coeff * q[1] - q[2] + processData[i];
-      q[2] = q[1];
-      q[1] = q[0];
+    remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
+
+    // trim leading 0's
+    if (out.length == 0) {
+      remainder = remainder.filter(function(v){return v});
     }
 
-    var real = q[1] - q[2] * cos;
-    var imag = q[2] * sin;
-    var magnitude = Math.pow(real,2) + Math.pow(imag, 2);
-    console.log("!");
-    paint(Array.prototype.slice.call(processData, 0), magnitude);
+    while(remainder.length > binsPerBit) {
+      var chunk = remainder.slice(0, binsPerBit);
+      remainder = remainder.slice(binsPerBit);
+      var q = [0,0,0];
 
-    out.push({
-      real: real,
-      imag: imag,
-      magnitude: magnitude
-    });
+      var realW = 2 * Math.cos(2 * Math.PI * k /binsPerBit);
+      var imagW = Math.sin(2 * Math.PI*k/binsPerBit);
+
+      for(var i=0; i<binsPerBit; ++i) {
+        var y = chunk[i] + realW * q[1] - q[2];
+        q[2] = q[1];
+        q[1] = y;
+      }
+
+      var resultR = 0.5 * realW * q[1] - q[2];
+      var resultI = imagW * q[1];
+
+      out.push({
+        real: resultR,
+        imag: resultI
+      });
+    }
+
+    paint(Array.prototype.slice.call(processData, 0), 0);
   };
 
   while(i++ < data.length) {
