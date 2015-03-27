@@ -32,7 +32,7 @@ function run() {
   var baud = parseInt(document.querySelector('[name="baud"]').value);
   var mark = parseInt(document.querySelector('[name="mark"]').value);
   var shift = parseInt(document.querySelector('[name="shift"]').value);
-  var binsPerBit = (SampleRate/bufferFrameSize)/baud * bufferFrameSize;
+  var binsPerBit = Math.ceil((SampleRate/bufferFrameSize)/baud * bufferFrameSize);
   remainder = [];
 
   k = 0.5 + (binsPerBit * (mark+shift) / SampleRate);
