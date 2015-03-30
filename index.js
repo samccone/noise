@@ -29,12 +29,12 @@ function run() {
   var sampleRate = context.sampleRate;
 
   var baud = parseInt(document.querySelector('[name="baud"]').value);
-  var mark = parseInt(document.querySelector('[name="mark"]').value);
-  var shift = parseInt(document.querySelector('[name="shift"]').value);
+  var low = parseInt(document.querySelector('[name="low"]').value);
+  var high = parseInt(document.querySelector('[name="high"]').value);
   var binsPerBit = Math.ceil((SampleRate/bufferFrameSize)/baud * bufferFrameSize);
   remainder = [];
 
-  k = 0.5 + (binsPerBit * (mark+shift) / SampleRate);
+  k = 0.5 + (binsPerBit * (high) / SampleRate);
 
   length = 1/baud;
 
@@ -81,7 +81,7 @@ function run() {
   };
 
   data.split('').forEach(function(v, i) {
-    osc.frequency.setValueAtTime(v == '1' ? mark+shift : mark, i*length+context.currentTime);
+    osc.frequency.setValueAtTime(v == '1' ? high : low, i*length+context.currentTime);
   });
 
   osc.start();
