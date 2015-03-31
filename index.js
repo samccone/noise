@@ -3,7 +3,7 @@ var SampleRate = 44100;
 var Audio = (window.AudioContext || window.webkitAudioContext);
 var context = new Audio();
 
-var data = '101010101010101010';
+var data = '10101010101010101010101010101010101010101010101010101010';
 
 var lastTime = 0;
 var out = [];
@@ -30,7 +30,7 @@ function paintAll() {
     ctx.fillStyle = data[i] == '0' ? 'rgba(0,0,255,0.2)' : 'rgba(255,0,0,0.2)';
     ctx.fillRect(i*20, 10, 10, 800)
     ctx.fillStyle = "black";
-    ctx.fillRect(i*20, out[i].imag * 0.25 + 300, 10, 10);
+    ctx.fillRect(i*20, out[i].m * 3 + 100, 10, 10);
   }
 }
 
@@ -44,7 +44,6 @@ function run() {
   remainder = [];
 
   k = 0.5 + (binsPerBit * (high) / SampleRate);
-
   length = 1/baud;
 
   osc = context.createOscillator();
@@ -83,15 +82,19 @@ function run() {
       var d1 = 0.0;
       var d2 = 0.0;
 
-      for(var i=0; i<binsPerBit; ++i) {
+      for(var i=0; i < binsPerBit; ++i) {
         var y = chunk[i] + realW * d1 - d2;
         d2 = d1;
         d1 = y;
       }
 
+      var r = 0.5 * realW * d1 - d2;
+      var im = imagW * d1;
+
       out.push({
-        real: 0.5 * realW * d1 - d2,
-        imag: imagW * d1
+        real: r,
+        imag: im * d1,
+        m: 20 * Math.log(Math.sqrt(Math.pow(r,2) + Math.pow(im,2)))
       });
     }
 
