@@ -3,7 +3,7 @@ var SampleRate = 44100;
 var Audio = (window.AudioContext || window.webkitAudioContext);
 var context = new Audio();
 
-var data = '01101000011001010110110001101100011011110010000001101101011110010010000001101110011000010110110101100101001000000110100101110011001000000111000001100001011101010110110000100000011010010010000001100001011011010010000001100001001000000110110101100001011011100010000001100001011011100110010000100000011010010010000001101000011000010111011001100101001000000110000100100000011011100110100101100011011001010010000001101100011010010110011001100101001000000110010001101111001000000111100101101111011101010010000001101100011010010110101101100101001000000110001101101000011001010111001101110011011001010010000001100010011001010110001101100001011101010111001101100101001000000111000001100001011101010110110000100000011001000110111101100101011100110010000001101110011011110111010000100000011010000110010100100000011010010111001100100000011001100111001001101111011011010010000001100011011000010110111001100001011001000110000100100000';
+var data = '101010101010101010';
 
 var lastTime = 0;
 var out = [];
@@ -25,13 +25,22 @@ function paint(d, m) {
   ctx.fillRect(x, m, 10, 10);
 }
 
+function paintAll() {
+  for(var i = 0; i < out.length; ++i) {
+    ctx.fillStyle = data[i] == '0' ? 'rgba(0,0,255,0.2)' : 'rgba(255,0,0,0.2)';
+    ctx.fillRect(i*20, 10, 10, 800)
+    ctx.fillStyle = "black";
+    ctx.fillRect(i*20, out[i].imag * 0.25 + 300, 10, 10);
+  }
+}
+
 function run() {
   var sampleRate = context.sampleRate;
 
   var baud = parseInt(document.querySelector('[name="baud"]').value);
   var low = parseInt(document.querySelector('[name="low"]').value);
   var high = parseInt(document.querySelector('[name="high"]').value);
-  var binsPerBit = Math.ceil((SampleRate/bufferFrameSize)/baud * bufferFrameSize);
+  var binsPerBit = Math.ceil(SampleRate/baud);
   remainder = [];
 
   k = 0.5 + (binsPerBit * (high) / SampleRate);
@@ -51,29 +60,36 @@ function run() {
 
     // trim leading 0's
     if (out.length === 0) {
-      remainder = remainder.filter(function(v){return v;});
+      var nonZeroFound = false;
+      remainder = remainder.map(function(v){
+        if (v !== 0 || nonZeroFound) {
+          nonZeroFound = true;
+          return v
+        }
+        return -666;
+      });
+
+      remainder = remainder.filter(function(v){return v !== -666})
     }
 
+    console.log(binsPerBit)
     while(remainder.length >= binsPerBit) {
       var chunk = remainder.slice(0, binsPerBit);
       remainder = remainder.slice(binsPerBit);
-      var q = [0,0,0];
-
       var realW = 2 * Math.cos(2 * Math.PI * k /binsPerBit);
       var imagW = Math.sin(2 * Math.PI*k/binsPerBit);
+      var d1 = 0.0;
+      var d2 = 0.0;
 
       for(var i=0; i<binsPerBit; ++i) {
-        var y = chunk[i] + realW * q[1] - q[2];
-        q[2] = q[1];
-        q[1] = y;
+        var y = chunk[i] + realW * d1 - d2;
+        d2 = d1;
+        d1 = y;
       }
 
-      var resultR = 0.5 * realW * q[1] - q[2];
-      var resultI = imagW * q[1];
-
       out.push({
-        real: resultR,
-        imag: resultI
+        real: 0.5 * realW * d1 - d2,
+        imag: imagW * d1
       });
     }
 
@@ -94,6 +110,7 @@ function run() {
     osc.disconnect(processor);
     osc.disconnect(context.destination);
     processor.disconnect(context.destination);
+    paintAll();
   };
 }
 
