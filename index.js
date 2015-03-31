@@ -48,8 +48,11 @@ function run() {
   length = 1/baud;
 
   osc = context.createOscillator();
+  osc2 = context.createOscillator();
   processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
   osc.connect(processor);
+  osc2.connect(processor);
+  osc2.connect(context.destination);
   osc.connect(context.destination);
   processor.connect(context.destination);
 
@@ -72,7 +75,6 @@ function run() {
       remainder = remainder.filter(function(v){return v !== -666})
     }
 
-    console.log(binsPerBit)
     while(remainder.length >= binsPerBit) {
       var chunk = remainder.slice(0, binsPerBit);
       remainder = remainder.slice(binsPerBit);
@@ -97,12 +99,15 @@ function run() {
   };
 
   data.split('').forEach(function(v, i) {
+    osc2.frequency.setValueAtTime(Math.random()*3000, i*length+context.currentTime);
     osc.frequency.setValueAtTime(v == '1' ? high : low, i*length+context.currentTime);
   });
 
+  osc2.start();
   osc.start();
   osc.frequency.value = 0;
 
+  osc2.stop(data.length*length+context.currentTime);
   osc.stop(data.length*length+context.currentTime);
   lastTime = data.length*length;
 
