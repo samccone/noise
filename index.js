@@ -3,7 +3,7 @@ var SampleRate = 44100;
 var Audio = (window.AudioContext || window.webkitAudioContext);
 var context = new Audio();
 
-var data = '10101010101010101010101010101010101010101010101010101010';
+var data = '';
 
 var lastTime = 0;
 var out = [];
@@ -11,6 +11,7 @@ var ctx = document.querySelector('canvas').getContext('2d');
 var processData = [];
 var k;
 var x = 0;
+var stringToBinary = require('string-to-binary');
 
 function paint(d, m) {
   ctx.beginPath();
@@ -34,13 +35,14 @@ function paintAll() {
   }
 }
 
-function run() {
+module.exports = function() {
   var sampleRate = context.sampleRate;
 
   var baud = parseInt(document.querySelector('[name="baud"]').value);
   var low = parseInt(document.querySelector('[name="low"]').value);
   var high = parseInt(document.querySelector('[name="high"]').value);
   var binsPerBit = Math.ceil(SampleRate/baud);
+  data = stringToBinary(document.querySelector('[name="message"]').value);
   remainder = [];
 
   k = 0.5 + (binsPerBit * (high) / SampleRate);
@@ -59,20 +61,6 @@ function run() {
     processData = e.inputBuffer.getChannelData(0);
 
     remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
-
-    // trim leading 0's
-    if (out.length === 0) {
-      var nonZeroFound = false;
-      remainder = remainder.map(function(v){
-        if (v !== 0 || nonZeroFound) {
-          nonZeroFound = true;
-          return v
-        }
-        return -666;
-      });
-
-      remainder = remainder.filter(function(v){return v !== -666})
-    }
 
     while(remainder.length >= binsPerBit) {
       var chunk = remainder.slice(0, binsPerBit);
