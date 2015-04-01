@@ -106,11 +106,11 @@ function run() {
     osc.frequency.setValueAtTime(v == '1' ? high : low, i*length+context.currentTime);
   });
 
-  osc2.start();
+//  osc2.start();
   osc.start();
   osc.frequency.value = 0;
 
-  osc2.stop(data.length*length+context.currentTime);
+//  osc2.stop(data.length*length+context.currentTime);
   osc.stop(data.length*length+context.currentTime);
   lastTime = data.length*length;
 
