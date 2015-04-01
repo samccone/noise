@@ -3,6 +3,7 @@
     "dev": "watchify index.js -o dist.js -s run -d -v"
   },
   "dependencies": {
+    "binary-to-string": "^0.1.0",
     "string-to-binary": "^0.1.0"
   },
   "devDependencies": {
