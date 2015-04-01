@@ -105,15 +105,15 @@ module.exports = function() {
   };
 
   data.split('').forEach(function(v, i) {
-    osc2.frequency.setValueAtTime(Math.random()*3000, i*length+context.currentTime);
+    osc2.frequency.setValueAtTime(Math.random()*2000, i*length+context.currentTime);
     osc.frequency.setValueAtTime(v == '1' ? high : low, i*length+context.currentTime);
   });
 
-//  osc2.start();
+  osc2.start();
   osc.start();
   osc.frequency.value = 0;
 
-//  osc2.stop(data.length*length+context.currentTime);
+  osc2.stop(data.length*length+context.currentTime);
   osc.stop(data.length*length+context.currentTime);
   lastTime = data.length*length;
 
