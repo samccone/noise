@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "dev": "watchify index.js -o dist.js -s run -d -v"
+  },
+  "dependencies": {
+    "string-to-binary": "^0.1.0"
+  },
+  "devDependencies": {
+    "watchify": "^3.1.0"
+  }
+}
