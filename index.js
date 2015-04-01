@@ -2,7 +2,7 @@ var bufferFrameSize = 2048;
 var SampleRate = 44100;
 var Audio = (window.AudioContext || window.webkitAudioContext);
 var context = new Audio();
-
+var LIMIT = 100;
 var data = '';
 
 var lastTime = 0;
@@ -12,6 +12,7 @@ var processData = [];
 var k;
 var x = 0;
 var stringToBinary = require('string-to-binary');
+var binaryToString = require('binary-to-string');
 
 function paint(d, m) {
   ctx.beginPath();
@@ -26,7 +27,7 @@ function paint(d, m) {
   ctx.fillRect(x, m, 10, 10);
 }
 
-function paintAll() {
+function paintAll(out, data) {
   var sorted = out.map(function(v){return v.m}).sort(function(a, b){ return a - b; });
   var min = sorted[0];
   var max = sorted[data.length-1];
@@ -34,9 +35,19 @@ function paintAll() {
   for(var i = 0; i < out.length; ++i) {
     ctx.fillStyle = data[i] == '0' ? 'rgba(0,0,255,0.2)' : 'rgba(255,0,0,0.2)';
     ctx.fillRect(i*20, 0, 10, 800);
-    ctx.fillStyle = out[i].m > 100 ? "rgba(255,0,0,0.5)" : "rgba(0,0,255, 0.5)";
+    ctx.fillStyle = out[i].m > LIMIT ? "rgba(255,0,0,0.5)" : "rgba(0,0,255, 0.5)";
     ctx.fillRect(i*20, out[i].m - min, 10, 10);
   }
+}
+
+function decode(out) {
+  console.log(
+    binaryToString(
+      out.map(function(v) {
+        return v.m > LIMIT ? 1 : 0;
+      }).join('')
+    )
+  );
 }
 
 module.exports = function() {
@@ -110,7 +121,8 @@ module.exports = function() {
     osc.disconnect(processor);
     osc.disconnect(context.destination);
     processor.disconnect(context.destination);
-    paintAll();
+    paintAll(out, data);
+    decode(out);
   };
 }
 
