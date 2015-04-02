@@ -1,7 +1,7 @@
 var bufferFrameSize = 2048;
-var SampleRate = 44100;
 var Audio = (window.AudioContext || window.webkitAudioContext);
 var context = new Audio();
+var SAMPLE_RATE = context.sampleRate;
 var LIMIT = 100;
 var data = '';
 
@@ -83,16 +83,14 @@ function processChunk(k, binsPerBit, raw, out) {
 }
 
 function run() {
-  var sampleRate = context.sampleRate;
-
   var baud = parseInt(document.querySelector('[name="baud"]').value);
   var low = parseInt(document.querySelector('[name="low"]').value);
   var high = parseInt(document.querySelector('[name="high"]').value);
-  var binsPerBit = Math.ceil(SampleRate/baud);
+  var binsPerBit = Math.ceil(SAMPLE_RATE/baud);
   data = stringToBinary(document.querySelector('[name="message"]').value);
   remainder = [];
 
-  k = 0.5 + (binsPerBit * (high) / SampleRate);
+  k = 0.5 + (binsPerBit * (high) / SAMPLE_RATE);
   length = 1/baud;
 
   osc = context.createOscillator();
@@ -135,13 +133,12 @@ function run() {
 function startMic() {
   navigator.webkitGetUserMedia({audio: true}, function(stream) {
     mic = context.createMediaStreamSource(stream);
-    var sampleRate = context.sampleRate;
     var baud = parseInt(document.querySelector('[name="baud"]').value);
     var low = parseInt(document.querySelector('[name="low"]').value);
     var high = parseInt(document.querySelector('[name="high"]').value);
-    var binsPerBit = Math.ceil(SampleRate/baud);
+    var binsPerBit = Math.ceil(SAMPLE_RATE/baud);
     remainder = [];
-    k = 0.5 + (binsPerBit * (high) / SampleRate);
+    k = 0.5 + (binsPerBit * (high) / SAMPLE_RATE);
 
     processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
     mic.connect(processor);
