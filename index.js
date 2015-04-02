@@ -39,12 +39,12 @@ function paintAll(out, data) {
 
   for (var i = 0; i < out.length; ++i) {
     ctx.fillStyle = data[i] == '0' ? 'rgba(0,0,255,0.2)' : 'rgba(255,0,0,0.2)';
-    ctx.fillRect(i*20, 0, 10, 800);
-    ctx.fillStyle = out[i].m > BitThreshold ? "rgba(255,0,0,0.5)" : "rgba(0,0,255, 0.5)";
-    ctx.fillRect(i*20, out[i].m, 10, 10);
+    ctx.fillRect(i * 20, 0, 10, 800);
+    ctx.fillStyle = out[i].m > BitThreshold ? 'rgba(255,0,0,0.5)' : 'rgba(0,0,255, 0.5)';
+    ctx.fillRect(i * 20, out[i].m, 10, 10);
 
-    ctx.fillStyle = "rgba(0,0,0,0.5)";
-    ctx.fillRect(i*20 + 2.5, BitThreshold + 2.5, 5, 5);
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(i * 20 + 2.5, BitThreshold + 2.5, 5, 5);
   }
 }
 
@@ -57,7 +57,6 @@ function decode(out) {
     )
   );
 }
-
 
 function goertzel(k, binsPerBit, raw, out) {
   var realW = 2 * Math.cos(2 * Math.PI * k / binsPerBit);
