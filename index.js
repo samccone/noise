@@ -29,8 +29,8 @@ function paint(d, m) {
 }
 
 function paintAll(out, data) {
-  var sorted = out.map(function(v){return v.m})
-  .filter(function(v){return v !== -Infinity})
+  var sorted = out.map(function(v){return v.m;})
+  .filter(function(v){return v !== -Infinity;})
   .sort(function(a, b){ return a - b; });
 
   var min = sorted[0];
@@ -132,7 +132,7 @@ function run() {
   };
 }
 
-function mic() {
+function startMic() {
   navigator.webkitGetUserMedia({audio: true}, function(stream) {
     mic = context.createMediaStreamSource(stream);
     var sampleRate = context.sampleRate;
@@ -151,7 +151,7 @@ function mic() {
       processData = e.inputBuffer.getChannelData(0);
       remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
       remainder = processChunk(k, binsPerBit, remainder, out);
-    }
+    };
   }, function(err) { });
 }
 
@@ -163,6 +163,6 @@ function closeMic() {
 
 module.exports = {
   run: run,
-  mic: mic,
+  mic: startMic,
   closeMic: closeMic
-}
+};
