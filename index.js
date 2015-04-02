@@ -37,6 +37,8 @@ function paintAll(out, data) {
   var min = sorted[0];
   var max = sorted[sorted.length - 1];
 
+  console.log("[" + min + "," + max + "]");
+
   for (var i = 0; i < out.length; ++i) {
     ctx.fillStyle = data[i] == '0' ? 'rgba(0,0,255,0.2)' : 'rgba(255,0,0,0.2)';
     ctx.fillRect(i * 20, 0, 10, 800);
@@ -58,6 +60,10 @@ function decode(out) {
   );
 }
 
+function hamming(n, N) {
+  return 0.54 - 0.47 * Math.cos(2 * Math.PI * n / N);
+}
+
 function goertzel(k, binsPerBit, raw, out) {
   var realW = 2 * Math.cos(2 * Math.PI * k / binsPerBit);
   var imagW = Math.sin(2 * Math.PI * k / binsPerBit);
@@ -68,7 +74,9 @@ function goertzel(k, binsPerBit, raw, out) {
     var d2 = 0.0;
 
     for (var i = 0; i < binsPerBit; ++i) {
-      var y = chunk[i] + realW * d1 - d2;
+      var x = chunk[i];
+      x *= hamming(x, binsPerBit);
+      var y = x + realW * d1 - d2;
       d2 = d1;
       d1 = y;
     }
@@ -92,7 +100,7 @@ function run() {
   var low = parseInt(document.querySelector('[name="low"]').value);
   var high = parseInt(document.querySelector('[name="high"]').value);
   var binsPerBit = Math.ceil(SAMPLE_RATE / baud);
-  BitThreshold = 82 - 0.09 * baud;
+  BitThreshold = 65 - 0.18 * baud;
 
   data = stringToBinary(document.querySelector('[name="message"]').value);
   remainder = [];
