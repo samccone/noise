@@ -2,7 +2,7 @@ var bufferFrameSize = 2048;
 var Audio = (window.AudioContext || window.webkitAudioContext);
 var context = new Audio();
 var SAMPLE_RATE = context.sampleRate;
-var LIMIT = 100;
+var BitThreshold;
 var data = '';
 
 var lastTime = 0;
@@ -29,18 +29,22 @@ function paint(d, m) {
 }
 
 function paintAll(out, data) {
+  ctx.clearRect(0, 0, 6400, 800);
   var sorted = out.map(function(v) { return v.m; })
   .filter(function(v) { return v !== -Infinity; })
   .sort(function(a, b) { return a - b; });
 
   var min = sorted[0];
-  var max = sorted[data.length - 1];
+  var max = sorted[sorted.length - 1];
 
   for (var i = 0; i < out.length; ++i) {
     ctx.fillStyle = data[i] == '0' ? 'rgba(0,0,255,0.2)' : 'rgba(255,0,0,0.2)';
-    ctx.fillRect(i * 20, 0, 10, 800);
-    ctx.fillStyle = out[i].m > LIMIT ? 'rgba(255,0,0,0.5)' : 'rgba(0,0,255, 0.5)';
-    ctx.fillRect(i * 20, out[i].m - min, 10, 10);
+    ctx.fillRect(i*20, 0, 10, 800);
+    ctx.fillStyle = out[i].m > BitThreshold ? "rgba(255,0,0,0.5)" : "rgba(0,0,255, 0.5)";
+    ctx.fillRect(i*20, out[i].m, 10, 10);
+
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    ctx.fillRect(i*20 + 2.5, BitThreshold + 2.5, 5, 5);
   }
 }
 
@@ -48,18 +52,19 @@ function decode(out) {
   console.log(
     binaryToString(
       out.map(function(v) {
-        return v.m > LIMIT ? 1 : 0;
+        return v.m > BitThreshold ? 1 : 0;
       }).join('')
     )
   );
 }
 
-function processChunk(k, binsPerBit, raw, out) {
+
+function goertzel(k, binsPerBit, raw, out) {
+  var realW = 2 * Math.cos(2 * Math.PI * k / binsPerBit);
+  var imagW = Math.sin(2 * Math.PI * k / binsPerBit);
   while (raw.length >= binsPerBit) {
     var chunk = raw.slice(0, binsPerBit);
     raw = raw.slice(binsPerBit);
-    var realW = 2 * Math.cos(2 * Math.PI * k / binsPerBit);
-    var imagW = Math.sin(2 * Math.PI * k / binsPerBit);
     var d1 = 0.0;
     var d2 = 0.0;
 
@@ -83,10 +88,13 @@ function processChunk(k, binsPerBit, raw, out) {
 }
 
 function run() {
+  out = [];
   var baud = parseInt(document.querySelector('[name="baud"]').value);
   var low = parseInt(document.querySelector('[name="low"]').value);
   var high = parseInt(document.querySelector('[name="high"]').value);
   var binsPerBit = Math.ceil(SAMPLE_RATE / baud);
+  BitThreshold = 82 - 0.09 * baud;
+
   data = stringToBinary(document.querySelector('[name="message"]').value);
   remainder = [];
 
@@ -105,7 +113,7 @@ function run() {
   processor.onaudioprocess = function(e) {
     processData = e.inputBuffer.getChannelData(0);
     remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
-    remainder = processChunk(k, binsPerBit, remainder, out);
+    remainder = goertzel(k, binsPerBit, remainder, out);
   };
 
   data.split('').forEach(function(v, i) {
@@ -147,7 +155,7 @@ function startMic() {
     processor.onaudioprocess = function(e) {
       processData = e.inputBuffer.getChannelData(0);
       remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
-      remainder = processChunk(k, binsPerBit, remainder, out);
+      remainder = goertzel(k, binsPerBit, remainder, out);
     };
   }, function(err) { });
 }
