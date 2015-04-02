@@ -54,6 +54,34 @@ function decode(out) {
   );
 }
 
+function processChunk(k, binsPerBit, raw, out) {
+  while(raw.length >= binsPerBit) {
+    var chunk = raw.slice(0, binsPerBit);
+    raw = raw.slice(binsPerBit);
+    var realW = 2 * Math.cos(2 * Math.PI * k /binsPerBit);
+    var imagW = Math.sin(2 * Math.PI*k/binsPerBit);
+    var d1 = 0.0;
+    var d2 = 0.0;
+
+    for(var i=0; i < binsPerBit; ++i) {
+      var y = chunk[i] + realW * d1 - d2;
+      d2 = d1;
+      d1 = y;
+    }
+
+    var r = 0.5 * realW * d1 - d2;
+    var im = imagW * d1;
+
+    out.push({
+      real: r,
+      imag: im * d1,
+      m: 20 * Math.log(Math.sqrt(Math.pow(r,2) + Math.pow(im,2)))
+    });
+  }
+
+  return raw;
+}
+
 function run() {
   var sampleRate = context.sampleRate;
 
@@ -78,34 +106,8 @@ function run() {
 
   processor.onaudioprocess = function(e) {
     processData = e.inputBuffer.getChannelData(0);
-
     remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
-
-    while(remainder.length >= binsPerBit) {
-      var chunk = remainder.slice(0, binsPerBit);
-      remainder = remainder.slice(binsPerBit);
-      var realW = 2 * Math.cos(2 * Math.PI * k /binsPerBit);
-      var imagW = Math.sin(2 * Math.PI*k/binsPerBit);
-      var d1 = 0.0;
-      var d2 = 0.0;
-
-      for(var i=0; i < binsPerBit; ++i) {
-        var y = chunk[i] + realW * d1 - d2;
-        d2 = d1;
-        d1 = y;
-      }
-
-      var r = 0.5 * realW * d1 - d2;
-      var im = imagW * d1;
-
-      out.push({
-        real: r,
-        imag: im * d1,
-        m: 20 * Math.log(Math.sqrt(Math.pow(r,2) + Math.pow(im,2)))
-      });
-    }
-
-    //paint(Array.prototype.slice.call(processData, 0), 0);
+    remainder = processChunk(k, binsPerBit, remainder, out);
   };
 
   data.split('').forEach(function(v, i) {
@@ -147,34 +149,9 @@ function mic() {
 
     processor.onaudioprocess = function(e) {
       processData = e.inputBuffer.getChannelData(0);
-
       remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
-
-      while(remainder.length >= binsPerBit) {
-        var chunk = remainder.slice(0, binsPerBit);
-        remainder = remainder.slice(binsPerBit);
-        var realW = 2 * Math.cos(2 * Math.PI * k /binsPerBit);
-        var imagW = Math.sin(2 * Math.PI*k/binsPerBit);
-        var d1 = 0.0;
-        var d2 = 0.0;
-
-        for(var i=0; i < binsPerBit; ++i) {
-          var y = chunk[i] + realW * d1 - d2;
-          d2 = d1;
-          d1 = y;
-        }
-
-        var r = 0.5 * realW * d1 - d2;
-        var im = imagW * d1;
-
-        out.push({
-          real: r,
-          imag: im * d1,
-          m: 20 * Math.log(Math.sqrt(Math.pow(r,2) + Math.pow(im,2)))
-        });
-      }
-    };
-
+      remainder = processChunk(k, binsPerBit, remainder, out);
+    }
   }, function(err) { });
 }
 
