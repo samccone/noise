@@ -37,6 +37,8 @@ function paintAll(out, data) {
   var min = sorted[0];
   var max = sorted[sorted.length - 1];
 
+  console.log("[" + min + "," + max + "]");
+
   for (var i = 0; i < out.length; ++i) {
     ctx.fillStyle = data[i] == '0' ? 'rgba(0,0,255,0.2)' : 'rgba(255,0,0,0.2)';
     ctx.fillRect(i * 20, 0, 10, 800);
@@ -98,7 +100,7 @@ function run() {
   var low = parseInt(document.querySelector('[name="low"]').value);
   var high = parseInt(document.querySelector('[name="high"]').value);
   var binsPerBit = Math.ceil(SAMPLE_RATE / baud);
-  BitThreshold = 82 - 0.09 * baud;
+  BitThreshold = 65 - 0.18 * baud;
 
   data = stringToBinary(document.querySelector('[name="message"]').value);
   remainder = [];
