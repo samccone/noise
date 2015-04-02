@@ -58,6 +58,10 @@ function decode(out) {
   );
 }
 
+function hamming(n, N) {
+  return 0.54 - 0.47 * Math.cos(2 * Math.PI * n / N);
+}
+
 function goertzel(k, binsPerBit, raw, out) {
   var realW = 2 * Math.cos(2 * Math.PI * k / binsPerBit);
   var imagW = Math.sin(2 * Math.PI * k / binsPerBit);
@@ -68,7 +72,9 @@ function goertzel(k, binsPerBit, raw, out) {
     var d2 = 0.0;
 
     for (var i = 0; i < binsPerBit; ++i) {
-      var y = chunk[i] + realW * d1 - d2;
+      var x = chunk[i];
+      x *= hamming(x, binsPerBit);
+      var y = x + realW * d1 - d2;
       d2 = d1;
       d1 = y;
     }
