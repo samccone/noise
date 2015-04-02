@@ -11,6 +11,7 @@ var ctx = document.querySelector('canvas').getContext('2d');
 var processData = [];
 var k;
 var x = 0;
+var mic;
 var stringToBinary = require('string-to-binary');
 var binaryToString = require('binary-to-string');
 
@@ -28,7 +29,10 @@ function paint(d, m) {
 }
 
 function paintAll(out, data) {
-  var sorted = out.map(function(v){return v.m}).sort(function(a, b){ return a - b; });
+  var sorted = out.map(function(v){return v.m})
+  .filter(function(v){return v !== -Infinity})
+  .sort(function(a, b){ return a - b; });
+
   var min = sorted[0];
   var max = sorted[data.length-1];
 
@@ -50,7 +54,7 @@ function decode(out) {
   );
 }
 
-module.exports = function() {
+function run() {
   var sampleRate = context.sampleRate;
 
   var baud = parseInt(document.querySelector('[name="baud"]').value);
@@ -67,8 +71,8 @@ module.exports = function() {
   osc2 = context.createOscillator();
   processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
   osc.connect(processor);
-  osc2.connect(processor);
-  osc2.connect(context.destination);
+  //osc2.connect(processor);
+  //osc2.connect(context.destination);
   osc.connect(context.destination);
   processor.connect(context.destination);
 
@@ -109,11 +113,11 @@ module.exports = function() {
     osc.frequency.setValueAtTime(v == '1' ? high : low, i*length+context.currentTime);
   });
 
-  osc2.start();
+  //osc2.start();
   osc.start();
   osc.frequency.value = 0;
 
-  osc2.stop(data.length*length+context.currentTime);
+  //osc2.stop(data.length*length+context.currentTime);
   osc.stop(data.length*length+context.currentTime);
   lastTime = data.length*length;
 
@@ -126,3 +130,62 @@ module.exports = function() {
   };
 }
 
+function mic() {
+  navigator.webkitGetUserMedia({audio: true}, function(stream) {
+    mic = context.createMediaStreamSource(stream);
+    var sampleRate = context.sampleRate;
+    var baud = parseInt(document.querySelector('[name="baud"]').value);
+    var low = parseInt(document.querySelector('[name="low"]').value);
+    var high = parseInt(document.querySelector('[name="high"]').value);
+    var binsPerBit = Math.ceil(SampleRate/baud);
+    remainder = [];
+    k = 0.5 + (binsPerBit * (high) / SampleRate);
+
+    processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
+    mic.connect(processor);
+    processor.connect(context.destination);
+
+    processor.onaudioprocess = function(e) {
+      processData = e.inputBuffer.getChannelData(0);
+
+      remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
+
+      while(remainder.length >= binsPerBit) {
+        var chunk = remainder.slice(0, binsPerBit);
+        remainder = remainder.slice(binsPerBit);
+        var realW = 2 * Math.cos(2 * Math.PI * k /binsPerBit);
+        var imagW = Math.sin(2 * Math.PI*k/binsPerBit);
+        var d1 = 0.0;
+        var d2 = 0.0;
+
+        for(var i=0; i < binsPerBit; ++i) {
+          var y = chunk[i] + realW * d1 - d2;
+          d2 = d1;
+          d1 = y;
+        }
+
+        var r = 0.5 * realW * d1 - d2;
+        var im = imagW * d1;
+
+        out.push({
+          real: r,
+          imag: im * d1,
+          m: 20 * Math.log(Math.sqrt(Math.pow(r,2) + Math.pow(im,2)))
+        });
+      }
+    };
+
+  }, function(err) { });
+}
+
+function closeMic() {
+  mic.disconnect(processor);
+  paintAll(out, data);
+  decode(out);
+}
+
+module.exports = {
+  run: run,
+  mic: mic,
+  closeMic: closeMic
+}
