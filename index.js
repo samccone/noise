@@ -116,7 +116,7 @@ function run() {
   });
 
   //osc2.start();
-  osc.start();
+  osc.start(context.currentTime);
   osc.frequency.value = 0;
 
   //osc2.stop(data.length*length+context.currentTime);
