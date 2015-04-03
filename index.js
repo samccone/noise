@@ -50,14 +50,10 @@ function paintAll(out, data) {
   }
 }
 
-function decode(out) {
-  console.log(
-    binaryToString(
-      out.map(function(v) {
-        return v.m > BitThreshold ? 1 : 0;
-      }).join('')
-    )
-  );
+function decode(out, baud) {
+  var unmap = out.map(function(v) { return v.m > BitThreshold ? 1 : 0; });
+  var unpadded = unpadSignal(unmap, baud);
+  console.log(binaryToString(unpadded.join('')));
 }
 
 function hamming(n, N) {
@@ -94,6 +90,25 @@ function goertzel(k, binsPerBit, raw, out) {
   return raw;
 }
 
+function getNumberOfPaddingBits(bitsPerSecond) {
+  return Math.ceil(bitsPerSecond / 2);
+}
+
+function unpadSignal(bits, bitsPerSecond) {
+  bits = bits.slice(getNumberOfPaddingBits(bitsPerSecond));
+  return bits.slice(0, -getNumberOfPaddingBits(bitsPerSecond));
+}
+
+function padSignal(bits, bitsPerSecond) {
+  var padBits = '';
+
+  for (var i = 0; i < getNumberOfPaddingBits(bitsPerSecond); ++i) {
+    padBits += '1';
+  }
+
+  return padBits + bits + padBits;
+}
+
 function run() {
   out = [];
   var baud = parseInt(document.querySelector('[name="baud"]').value);
@@ -102,7 +117,11 @@ function run() {
   var binsPerBit = Math.ceil(SAMPLE_RATE / baud);
   BitThreshold = 65 - 0.18 * baud;
 
-  data = stringToBinary(document.querySelector('[name="message"]').value);
+  data = padSignal(
+    stringToBinary(document.querySelector('[name="message"]').value),
+    baud
+  );
+
   remainder = [];
 
   k = 0.5 + (binsPerBit * (high) / SAMPLE_RATE);
@@ -141,7 +160,7 @@ function run() {
     osc.disconnect(context.destination);
     processor.disconnect(context.destination);
     paintAll(out, data);
-    decode(out);
+    decode(out, baud);
   };
 }
 
@@ -170,7 +189,7 @@ function startMic() {
 function closeMic() {
   mic.disconnect(processor);
   paintAll(out, data);
-  decode(out);
+  decode(out, parseInt(document.querySelector('[name="baud"]').value));
 }
 
 module.exports = {
