@@ -10,23 +10,9 @@ var out = [];
 var ctx = document.querySelector('canvas').getContext('2d');
 var processData = [];
 var k;
-var x = 0;
 var mic;
 var stringToBinary = require('string-to-binary');
 var binaryToString = require('binary-to-string');
-
-function paint(d, m) {
-  ctx.beginPath();
-
-  for (var i = 0; i < d.length; ++i) {
-    ctx.lineTo(x + i / 4, 100 + d[i] * 20, 1, 1);
-  }
-  x += d.length / 4;
-
-  ctx.stroke();
-  ctx.closePath();
-  ctx.fillRect(x, m, 10, 10);
-}
 
 function paintAll(out, data) {
   ctx.clearRect(0, 0, 6400, 800);
