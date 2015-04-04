@@ -71,7 +71,7 @@ var diffGraph = document.createElement('canvas');
 diffGraph.setAttribute('height', rawHeight + 'px');
 diffGraph.setAttribute('width', rawWidth + 'px');
 var diffGraphCtx = diffGraph.getContext('2d');
-var diffRange = 10;
+var diffRange = 40;
 
 diffPoints = movingAverage
 .map(function(v, i, arr) {
@@ -116,7 +116,7 @@ dataGraph.setAttribute('height', rawHeight + 'px');
 dataGraph.setAttribute('width', rawWidth + 'px');
 var dataGraphCtx = dataGraph.getContext('2d');
 
-var dataBits = raw.slice(diffPoints.indexOf(minChange), diffPoints.indexOf(maxChange));
+var dataBits = raw.slice(diffPoints.indexOf(minChange) + 20, diffPoints.indexOf(maxChange));
 
 var minDataBit = _.min(dataBits);
 
