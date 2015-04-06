@@ -77,7 +77,7 @@ function goertzel(k, binsPerBit, raw, out) {
 }
 
 function getNumberOfPaddingBits(bitsPerSecond) {
-  return Math.ceil(bitsPerSecond / 2);
+  return Math.ceil(bitsPerSecond / 2) + 2;
 }
 
 function unpadSignal(bits, bitsPerSecond) {
@@ -89,7 +89,7 @@ function padSignal(bits, bitsPerSecond) {
   var padBits = '';
 
   for (var i = 0; i < getNumberOfPaddingBits(bitsPerSecond); ++i) {
-    padBits += '1';
+    padBits += i < getNumberOfPaddingBits(bitsPerSecond) - 2 ? '1' : 0;
   }
 
   return padBits + bits + padBits;
