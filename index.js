@@ -23,7 +23,7 @@ function paintAll(out, data) {
   var min = sorted[0];
   var max = sorted[sorted.length - 1];
 
-  console.log('[' + min + ',' + max + ']');
+  console.log(JSON.stringify(out.map(function(v) { return v.m; })));
 
   for (var i = 0; i < out.length; ++i) {
     ctx.fillStyle = data[i] == '0' ? 'rgba(0,0,255,0.2)' : 'rgba(255,0,0,0.2)';
