@@ -1,5 +1,12 @@
 {
+  "scripts": {
+    "dev": "watchify graph.js -o dist.js -d -v"
+  },
   "dependencies": {
+    "binary-to-string": "^0.1.0",
     "lodash": "^3.6.0"
+  },
+  "devDependencies": {
+    "watchify": "^3.1.0"
   }
 }
