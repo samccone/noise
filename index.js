@@ -16,24 +16,25 @@ var binaryToString = require('binary-to-string');
 
 function paintAll(out, data) {
   ctx.clearRect(0, 0, 6400, 800);
-  var sorted = out.map(function(v) { return v.m; })
-  .filter(function(v) { return v !== -Infinity; })
-  .sort(function(a, b) { return a - b; });
+  var filtered = out.map(function(v) { return v.m; })
+  .filter(function(v) { return v !== -Infinity && v !== null })
 
-  var min = sorted[0];
-  var max = sorted[sorted.length - 1];
+  var min = _.min(filtered);
+  var max = _.max(filtered) - min;
 
-  console.log(JSON.stringify(out.map(function(v) { return v.m; })));
+  filtered = _.map(filtered, function(v) {
+    return (v - min) / max
+  });
 
-  for (var i = 0; i < out.length; ++i) {
+  filtered.forEach(function(v, i) {
     ctx.fillStyle = data[i] == '0' ? 'rgba(0,0,255,0.2)' : 'rgba(255,0,0,0.2)';
     ctx.fillRect(i * 20, 0, 10, 800);
-    ctx.fillStyle = out[i].m > BitThreshold ? 'rgba(255,0,0,0.5)' : 'rgba(0,0,255, 0.5)';
-    ctx.fillRect(i * 20, out[i].m, 10, 10);
+    ctx.fillStyle = v > 0.5 ? 'rgba(255,0,0,0.5)' : 'rgba(0,0,255, 0.5)';
+    ctx.fillRect(i * 20, v * 400, 10, 10);
 
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(i * 20 + 2.5, BitThreshold + 2.5, 5, 5);
-  }
+    ctx.fillRect(i * 20 + 2.5, v * 400, 5, 5);
+  });
 }
 
 function decode(out, baud) {
