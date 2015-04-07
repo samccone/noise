@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var bufferFrameSize = 2048;
 var Audio = (window.AudioContext || window.webkitAudioContext);
 var context = new Audio();
