@@ -18,13 +18,13 @@ var binaryToString = require('binary-to-string');
 function paintAll(out, data) {
   ctx.clearRect(0, 0, 6400, 800);
   var filtered = out.map(function(v) { return v.m; })
-  .filter(function(v) { return v !== -Infinity && v !== null })
+  .filter(function(v) { return v !== -Infinity && v !== null; });
 
   var min = _.min(filtered);
   var max = _.max(filtered) - min;
 
   filtered = _.map(filtered, function(v) {
-    return (v - min) / max
+    return (v - min) / max;
   });
 
   filtered.forEach(function(v, i) {
