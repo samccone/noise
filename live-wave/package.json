@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dev": "babel index.js --watch --out-file dist.js --source-maps inline"
+  },
+  "devDependencies": {
+    "babel": "^5.1.8"
+  }
+}
