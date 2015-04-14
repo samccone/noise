@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "dev": "watchify index.js -t babelify --outfile dist.js -s noise -d -v"
+  },
+  "devDependencies": {
+    "babel": "^5.1.8",
+    "babelify": "^6.0.2",
+    "browserify": "^9.0.8",
+    "watchify": "^3.1.0"
+  },
+  "dependencies": {
+    "binary-to-string": "^0.1.0",
+    "string-to-binary": "^0.1.0"
+  }
+}

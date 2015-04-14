@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <style>
+      textarea {
+        display: block;
+        font-size: 45px;
+        width: 90%;
+        padding: 10px;
+        margin: 0 auto;
+      }
+      .reload {
+        font-size: 60px;
+        font-weight: bold;
+        position: absolute;
+        bottom: 0;
+        right: 10px;
+        color: #CCC;
+      }
+      button {
+        display: block;
+        padding: 10px;
+        margin: 20px auto;
+        font-size: 25px;
+      }
+      * { padding: 0; margin: 0; }
+      canvas {display: block; margin: 0 auto; width: 100%; max-width: 1024px;}
+    </style>
+  </head>
+  <body>
+    <div class='demo'>
+      <textarea id='input'> Hello JSCONF! </textarea>
+      <button id='run-demo' onClick='noise.run()'>Run And Decode</button>
+      <textarea id='output'></textarea>
+    </div>
+    <script src="dist.js"></script>
+    <div class="reload" onClick="window.location=window.location">&#x21bb;</div>
+  </body>
+</html>
