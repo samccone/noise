@@ -5,10 +5,8 @@ const Audio = (window.AudioContext || window.webkitAudioContext);
 const context = new Audio();
 const SAMPLE_RATE = context.sampleRate;
 const bufferFrameSize = 2048;
-const baud = 45.45;
 const low = 2125;
 const high = 2295;
-const binsPerBit = Math.ceil(SAMPLE_RATE / baud);
 let lastTime = 0;
 
 function getNumberOfPaddingBits(bitsPerSecond) {
@@ -74,10 +72,13 @@ function goertzel(k, binsPerBit, raw, out) {
   return raw;
 }
 
-function run() {
+function run(b, message) {
+  const baud = b || 45.45;
+  const binsPerBit = Math.ceil(SAMPLE_RATE / baud);
+
   let out = [];
   let data = padSignal(
-    stringToBinary(document.querySelector('#input').value),
+    stringToBinary(message || document.querySelector('#input').value),
     baud
   );
   let remainder = [];
