@@ -21,7 +21,12 @@ function stopOsc() {
   osc = null;
 }
 
+function encodeString(string, outputContainer) {
+  outputContainer.innerHTML = require('string-to-binary')(string);
+}
+
 module.exports = {
   stopOsc: stopOsc,
+  onStringChange: encodeString,
   updateOsc: updateOsc
 };

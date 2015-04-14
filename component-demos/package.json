@@ -5,5 +5,9 @@
   "devDependencies": {
     "babelify": "^6.0.2",
     "watchify": "^3.1.0"
+  },
+  "dependencies": {
+    "binary-to-string": "^0.1.0",
+    "string-to-binary": "^0.1.0"
   }
 }
