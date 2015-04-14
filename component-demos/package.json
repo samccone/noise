@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "dev": "watchify index.js -t babelify --outfile dist.js -s noise -d -v"
+  },
+  "devDependencies": {
+    "babelify": "^6.0.2",
+    "watchify": "^3.1.0"
+  }
+}
