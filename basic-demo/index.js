@@ -22,7 +22,9 @@ function decode(out, baud) {
 
   let output = document.querySelector('#output');
 
-  output && (output.innerHTML = binaryToString(unpadded.join('')));
+  if (output) {
+    output.innerHTML = binaryToString(unpadded.join(''));
+  }
 }
 
 function unpadSignal(bits, bitsPerSecond) {
@@ -97,8 +99,6 @@ function paintOutput(out) {
     ctx.fillStyle = v > 0.5 ? 'red' : 'blue';
     ctx.fillRect(i * width/arr.length, v * height *.8, 2, 2);
   });
-
-  return true;
 }
 
 function run(b, message, paint) {
@@ -142,7 +142,8 @@ function run(b, message, paint) {
     osc.disconnect(processor);
     osc.disconnect(context.destination);
     processor.disconnect(context.destination);
-    paintOutput(out) && decode(out, baud);
+    paintOutput(out);
+    decode(out, baud);
   };
 }
 
