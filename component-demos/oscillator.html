@@ -11,6 +11,7 @@
       }
       input[type="range"] {height: 50px; width: 500px; margin: 0 auto; display: block;}
       * { padding: 0; margin: 0; }
+  .close {position: absolute; bottom: 10px; left: 10px; font-size: 20px; opacity: 0.5}
     </style>
   </head>
   <body>
@@ -18,7 +19,7 @@
       <input type="range" min="500" max="4000" value="1400" onChange="noise.updateOsc()"/>
     </div>
     <script src="dist.js"></script>
-
+    <div class="close" onClick="window.location='http://blank.org/'">&#x2717;</div>
     <div class="reload" onClick="window.location=window.location">&#x21bb;</div>
     <button onClick="noise.stopOsc()">stop</button>
   </body>

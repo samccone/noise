@@ -22,6 +22,7 @@
         margin: 20px auto;
         font-size: 25px;
       }
+    .close {position: absolute; bottom: 10px; left: 10px; font-size: 20px; opacity: 0.5}
       * { padding: 0; margin: 0; }
       canvas {display: block; margin: 0 auto; width: 100%; max-width: 1024px;}
     </style>
@@ -33,6 +34,7 @@
       <textarea id='output'></textarea>
     </div>
     <script src="dist.js"></script>
+    <div class="close" onClick="window.location='http://blank.org/'">&#x2717;</div>
     <div class="reload" onClick="window.location=window.location">&#x21bb;</div>
   </body>
 </html>
