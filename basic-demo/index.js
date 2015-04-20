@@ -20,7 +20,9 @@ function decode(out, baud) {
   let unmap = out.map(function(v) { return v.m > BitThreshold ? 1 : 0; });
   let unpadded = unpadSignal(unmap, baud);
 
-  document.querySelector('#output').innerHTML = binaryToString(unpadded.join(''));
+  let output = document.querySelector('#output');
+
+  output && (output.innerHTML = binaryToString(unpadded.join('')));
 }
 
 function unpadSignal(bits, bitsPerSecond) {
@@ -75,6 +77,9 @@ function goertzel(k, binsPerBit, raw, out) {
 
 function paintOutput(out) {
   const canvas = document.querySelector('canvas');
+
+  if (!canvas) { return; }
+
   const ctx = canvas.getContext('2d');
   const width = canvas.width;
   const height = canvas.height;
@@ -101,8 +106,9 @@ function run(b, message, paint) {
   const binsPerBit = Math.ceil(SAMPLE_RATE / baud);
 
   let out = [];
+  let stringMessage = (message || document.querySelector('#input').value);
   let data = padSignal(
-    stringToBinary(message || document.querySelector('#input').value),
+    stringToBinary(stringMessage + '  '),
     baud
   );
   let remainder = [];
@@ -136,7 +142,7 @@ function run(b, message, paint) {
     osc.disconnect(processor);
     osc.disconnect(context.destination);
     processor.disconnect(context.destination);
-    paint && paintOutput(out) || decode(out, baud);
+    paintOutput(out) && decode(out, baud);
   };
 }
 
