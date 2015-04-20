@@ -101,7 +101,7 @@ function paintOutput(out) {
   });
 }
 
-function run(b, message, paint) {
+function run(b, message, paint, noisy) {
   const baud = b || 45.45;
   const binsPerBit = Math.ceil(SAMPLE_RATE / baud);
 
@@ -116,7 +116,13 @@ function run(b, message, paint) {
   let length = 1 / baud;
 
   const osc = context.createOscillator();
+  const noiseOsc = context.createOscillator();
   const processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
+
+  if (noisy) {
+    noiseOsc.connect(processor);
+    noiseOsc.connect(context.destination);
+  }
 
   osc.connect(processor);
   osc.connect(context.destination);
@@ -129,12 +135,15 @@ function run(b, message, paint) {
   };
 
   data.split('').forEach(function(v, i) {
+    noisy && noiseOsc.frequency.setValueAtTime(Math.random()*1000+500, i * length + context.currentTime);
     osc.frequency.setValueAtTime(v == '1' ? high : low, i * length + context.currentTime);
   });
 
+  noisy && noiseOsc.start(context.currentTime);
   osc.start(context.currentTime);
   osc.frequency.value = 0;
 
+  noisy && noiseOsc.stop(data.length * length + context.currentTime);
   osc.stop(data.length * length + context.currentTime);
   lastTime = data.length * length;
 
