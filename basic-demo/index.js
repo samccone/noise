@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const stringToBinary = require('string-to-binary');
 const binaryToString = require('binary-to-string');
 
@@ -72,7 +73,30 @@ function goertzel(k, binsPerBit, raw, out) {
   return raw;
 }
 
-function run(b, message) {
+function paintOutput(out) {
+  const canvas = document.querySelector('canvas');
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  let normalized = out.map((v) => {return v.m});
+  const max = _.max(normalized);
+  const min = _.min(normalized);
+
+  ctx.clearRect(0, 0, width, height);
+
+  normalized
+  .map((v) => {
+    return (v - min) / (max - min)
+  })
+  .forEach((v, i, arr) => {
+    ctx.fillStyle = v > 0.5 ? 'red' : 'blue';
+    ctx.fillRect(i * width/arr.length, v * height *.8, 2, 2);
+  });
+
+  return true;
+}
+
+function run(b, message, paint) {
   const baud = b || 45.45;
   const binsPerBit = Math.ceil(SAMPLE_RATE / baud);
 
@@ -112,7 +136,7 @@ function run(b, message) {
     osc.disconnect(processor);
     osc.disconnect(context.destination);
     processor.disconnect(context.destination);
-    decode(out, baud);
+    paint && paintOutput(out) || decode(out, baud);
   };
 }
 

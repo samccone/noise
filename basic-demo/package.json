@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "binary-to-string": "^0.1.0",
+    "lodash": "^3.7.0",
     "string-to-binary": "^0.1.0"
   }
 }
