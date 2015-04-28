@@ -9,8 +9,8 @@
     "watchify": "^3.1.0"
   },
   "dependencies": {
-    "binary-to-string": "^0.1.0",
+    "binary-to-string": "^0.1.2",
     "lodash": "^3.7.0",
-    "string-to-binary": "^0.1.0"
+    "string-to-binary": "^0.1.2"
   }
 }
