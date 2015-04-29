@@ -85,19 +85,17 @@ function paintOutput(out) {
   const ctx = canvas.getContext('2d');
   const width = canvas.width;
   const height = canvas.height;
-  let normalized = out.map((v) => {return v.m});
+  let normalized = out.map(v => v.m);
   const max = _.max(normalized);
   const min = _.min(normalized);
 
   ctx.clearRect(0, 0, width, height);
 
   normalized
-  .map((v) => {
-    return (v - min) / (max - min)
-  })
+  .map(v => (v - min) / (max - min))
   .forEach((v, i, arr) => {
     ctx.fillStyle = v > 0.5 ? 'red' : 'blue';
-    ctx.fillRect(i * width/arr.length, v * height *.8, 2, 2);
+    ctx.fillRect(i * width / arr.length, v * height * 0.8, 2, 2);
   });
 }
 
@@ -135,15 +133,23 @@ function run(b, message, paint, noisy) {
   };
 
   data.split('').forEach(function(v, i) {
-    noisy && noiseOsc.frequency.setValueAtTime(Math.random()*1000+500, i * length + context.currentTime);
+    if (noisy) {
+      noiseOsc.frequency.setValueAtTime(Math.random() * 1000 + 500, i * length + context.currentTime);
+    }
+
     osc.frequency.setValueAtTime(v == '1' ? high : low, i * length + context.currentTime);
   });
 
-  noisy && noiseOsc.start(context.currentTime);
+  if (noisy) {
+    noiseOsc.start(context.currentTime);
+  }
+
   osc.start(context.currentTime);
   osc.frequency.value = 0;
 
-  noisy && noiseOsc.stop(data.length * length + context.currentTime);
+  if (noisy) {
+    noiseOsc.stop(data.length * length + context.currentTime);
+  }
   osc.stop(data.length * length + context.currentTime);
   lastTime = data.length * length;
 
