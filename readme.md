@@ -6,9 +6,9 @@
 
 ##### Demos
 
-* [Encoding Data to Binary](samccone.github.io/noise/component-demos/string-to-binary.html)
-* [Encoding Data to Audio](samccone.github.io/noise/component-demos/string-to-binary-to-wave.html)
-* [Graphing Frequency Intensity](samccone.github.io/noise/basic-demo/graph.html)
+* [Encoding Data to Binary](http://samccone.github.io/noise/component-demos/string-to-binary.html)
+* [Encoding Data to Audio](http://samccone.github.io/noise/component-demos/string-to-binary-to-wave.html)
+* [Graphing Frequency Intensity](http://samccone.github.io/noise/basic-demo/graph.html)
 * [A Working Modem Implementation](http://samccone.github.io/noise/basic-demo/everything.html)
 * [Dealing with Signal Noise](http://samccone.github.io/noise/basic-demo/noise.html)
 
