@@ -8,7 +8,7 @@ const SAMPLE_RATE = context.sampleRate;
 const bufferFrameSize = 256;
 const low = 2125;
 const high = 2295;
-const SHIFT = -500;
+const SHIFT = 1000;
 let lastTime = 0;
 
 function getNumberOfPaddingBits(bitsPerSecond) {
