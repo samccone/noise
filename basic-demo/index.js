@@ -164,7 +164,7 @@ function run(b, message, paint, noisy, plexers) {
     oscillators[i % oscillators.length]
     .frequency.setValueAtTime(v == '1' ?
                               high + i % oscillators.length * SHIFT :
-                              low + i % oscillators.length * SHIFT,
+                              low,
                               startTime);
   });
 
