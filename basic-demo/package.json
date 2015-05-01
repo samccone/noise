@@ -11,6 +11,7 @@
   "dependencies": {
     "binary-to-string": "^0.1.2",
     "lodash": "^3.7.0",
+    "lodash-contrib": "^241.4.14",
     "string-to-binary": "^0.1.2"
   }
 }

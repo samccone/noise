@@ -1,13 +1,14 @@
-const _ = require('lodash');
+const _ = require('lodash-contrib');
 const stringToBinary = require('string-to-binary');
 const binaryToString = require('binary-to-string');
 
 const Audio = (window.AudioContext || window.webkitAudioContext);
 const context = new Audio();
 const SAMPLE_RATE = context.sampleRate;
-const bufferFrameSize = 2048;
+const bufferFrameSize = 256;
 const low = 2125;
 const high = 2295;
+const SHIFT = -500;
 let lastTime = 0;
 
 function getNumberOfPaddingBits(bitsPerSecond) {
@@ -99,37 +100,59 @@ function paintOutput(out) {
   });
 }
 
-function run(b, message, paint, noisy) {
+function createOscillators(count) {
+  let oscillators = [];
+  for (let i = 0; i < count; ++i) {
+    oscillators.push(context.createOscillator());
+  }
+
+  return oscillators;
+}
+
+function run(b, message, paint, noisy, plexers) {
   const baud = b || 45.45;
   const binsPerBit = Math.ceil(SAMPLE_RATE / baud);
 
-  let out = [];
   let stringMessage = (message || document.querySelector('#input').value);
   let data = padSignal(
     stringToBinary(stringMessage + '  '),
     baud
   );
   let remainder = [];
-  let k = 0.5 + (binsPerBit * (high) / SAMPLE_RATE);
   let length = 1 / baud;
 
-  const osc = context.createOscillator();
+  const oscillators = createOscillators(plexers || 1);
   const noiseOsc = context.createOscillator();
   const processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
+
+  let out = [];
+
+  oscillators.forEach(() => out.push([]));
 
   if (noisy) {
     noiseOsc.connect(processor);
     noiseOsc.connect(context.destination);
   }
 
-  osc.connect(processor);
-  osc.connect(context.destination);
+  oscillators.forEach((osc) => {
+    osc.connect(processor);
+    osc.connect(context.destination);
+  });
+
   processor.connect(context.destination);
 
   processor.onaudioprocess = function(e) {
     let processData = e.inputBuffer.getChannelData(0);
     remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
-    remainder = goertzel(k, binsPerBit, remainder, out);
+
+    out.forEach((v, i, arr) => {
+      let k = 0.5 + (binsPerBit * (high + (i % oscillators.length) * SHIFT) / SAMPLE_RATE);
+      if (i == arr.length - 1) {
+        remainder = goertzel(k, binsPerBit, remainder, v);
+      } else {
+        goertzel(k, binsPerBit, remainder, v);
+      }
+    });
   };
 
   data.split('').forEach(function(v, i) {
@@ -137,28 +160,43 @@ function run(b, message, paint, noisy) {
       noiseOsc.frequency.setValueAtTime(Math.random() * 1000 + 500, i * length + context.currentTime);
     }
 
-    osc.frequency.setValueAtTime(v == '1' ? high : low, i * length + context.currentTime);
+    let startTime = (i - i % oscillators.length) * length / oscillators.length + context.currentTime;
+    oscillators[i % oscillators.length]
+    .frequency.setValueAtTime(v == '1' ?
+                              high + i % oscillators.length * SHIFT :
+                              low + i % oscillators.length * SHIFT,
+                              startTime);
   });
 
   if (noisy) {
     noiseOsc.start(context.currentTime);
   }
 
-  osc.start(context.currentTime);
-  osc.frequency.value = 0;
+  oscillators.forEach((osc) => {
+    osc.start(context.currentTime);
+    osc.frequency.value = 0;
+    osc.stop(data.length * length / oscillators.length + context.currentTime);
+  });
 
   if (noisy) {
     noiseOsc.stop(data.length * length + context.currentTime);
   }
-  osc.stop(data.length * length + context.currentTime);
+
   lastTime = data.length * length;
 
-  osc.onended = function() {
-    osc.disconnect(processor);
-    osc.disconnect(context.destination);
+  oscillators[0].onended = function() {
+    oscillators.forEach((osc) => {
+      osc.disconnect(processor);
+      osc.disconnect(context.destination);
+    });
+
     processor.disconnect(context.destination);
-    paintOutput(out);
-    decode(out, baud);
+    paintOutput(_.weave(...out));
+    try {
+      decode(_.weave(...out), baud);
+    } catch (e) {
+      console.log('error decoding');
+    }
   };
 }
 
