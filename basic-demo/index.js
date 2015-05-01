@@ -121,7 +121,7 @@ function run(b, message, paint, noisy, plexers) {
   let remainder = [];
   let length = 1 / baud;
 
-  const oscillators = createOscillators(plexers || 1);
+  const oscillators = createOscillators(plexers || 6);
   const noiseOsc = context.createOscillator();
   const processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
 
