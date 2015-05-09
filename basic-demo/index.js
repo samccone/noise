@@ -15,12 +15,14 @@ function getNumberOfPaddingBits(bitsPerSecond) {
   return Math.ceil(bitsPerSecond / 2) + 2;
 }
 
-function decode(out, baud) {
+function classifyBit(v, baud) {
   const BitThreshold = 65 - 0.18 * baud;
+  return v.m > BitThreshold ? 1 : 0;
+}
 
-  let unmap = out.map(function(v) { return v.m > BitThreshold ? 1 : 0; });
+function decode(out, baud) {
+  let unmap = out.map((v) => classifyBit(v, baud));
   let unpadded = unpadSignal(unmap, baud);
-
   let output = document.querySelector('#output');
 
   if (output) {
@@ -78,7 +80,7 @@ function goertzel(k, binsPerBit, raw, out) {
   return raw;
 }
 
-function paintOutput(out) {
+function paintOutput(out, baud) {
   const canvas = document.querySelector('canvas');
 
   if (!canvas) { return; }
@@ -95,7 +97,7 @@ function paintOutput(out) {
   normalized
   .map(v => (v - min) / (max - min))
   .forEach((v, i, arr) => {
-    ctx.fillStyle = v > 0.5 ? 'red' : 'blue';
+    ctx.fillStyle = classifyBit(out[i], baud) ? 'red' : 'blue';
     ctx.fillRect(i * width / arr.length, v * height * 0.8, 2, 2);
   });
 }
@@ -191,7 +193,7 @@ function run(b, message, paint, noisy, plexers) {
     });
 
     processor.disconnect(context.destination);
-    paintOutput(_.weave(...out));
+    paintOutput(_.weave(...out), baud);
     try {
       decode(_.weave(...out), baud);
     } catch (e) {
