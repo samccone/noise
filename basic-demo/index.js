@@ -10,9 +10,10 @@ const low = 2125;
 const high = 2295;
 const SHIFT = 1000;
 let lastTime = 0;
+let processedBits = 0;
 
 function getNumberOfPaddingBits(bitsPerSecond) {
-  return Math.ceil(bitsPerSecond / 2) + 2;
+  return Math.ceil(bitsPerSecond / 2) ;
 }
 
 function classifyBit(v, baud) {
@@ -22,7 +23,8 @@ function classifyBit(v, baud) {
 
 function decode(out, baud) {
   let unmap = out.map((v) => classifyBit(v, baud));
-  let unpadded = unpadSignal(unmap, baud);
+  let unpadded = processedBits < getNumberOfPaddingBits(baud) ? unpadSignal(unmap, baud) : unmap;
+
   let output = document.querySelector('#output');
 
   if (output) {
@@ -155,6 +157,9 @@ function run(b, message, paint, noisy, plexers) {
         goertzel(k, binsPerBit, remainder, v);
       }
     });
+
+    decode(_.weave(...out), baud);
+    paintOutput(_.weave(...out), baud);
   };
 
   data.split('').forEach(function(v, i) {
@@ -193,12 +198,6 @@ function run(b, message, paint, noisy, plexers) {
     });
 
     processor.disconnect(context.destination);
-    paintOutput(_.weave(...out), baud);
-    try {
-      decode(_.weave(...out), baud);
-    } catch (e) {
-      console.log('error decoding');
-    }
   };
 }
 
