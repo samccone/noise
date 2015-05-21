@@ -125,7 +125,7 @@ function run(b, message, paint, noisy, plexers) {
   let remainder = [];
   let length = 1 / baud;
 
-  const oscillators = createOscillators(plexers || 6);
+  const oscillators = createOscillators(plexers || 1);
   const noiseOsc = context.createOscillator();
   const processor = context.createScriptProcessor(bufferFrameSize, 1, 1);
 
@@ -162,7 +162,7 @@ function run(b, message, paint, noisy, plexers) {
     paintOutput(_.weave(...out), baud);
   };
 
-  data.split('').forEach(function(v, i) {
+  data.split('').forEach((v, i) => {
     if (noisy) {
       noiseOsc.frequency.setValueAtTime(Math.random() * 1000 + 500, i * length + context.currentTime);
     }
@@ -191,7 +191,7 @@ function run(b, message, paint, noisy, plexers) {
 
   lastTime = data.length * length;
 
-  oscillators[0].onended = function() {
+  oscillators[0].onended = () => {
     oscillators.forEach((osc) => {
       osc.disconnect(processor);
       osc.disconnect(context.destination);

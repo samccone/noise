@@ -36,8 +36,8 @@
     <div class='demo'>
       <textarea id='input'> All Together Now </textarea>
       <textarea id='output'>....</textarea>
-      <input type="number" id='baud' value="300"></input>
-      <button id='run-demo' onClick='noise.run(parseInt(document.querySelector("#baud").value), null, true)'>Run it!</button>
+      <input type="number" id='baud' value="300">
+      <button id='run-demo' onClick='noise.run(parseInt(document.querySelector("#baud").value))'>Run it!</button>
       <canvas width='600' height='125'></canvas>
     </div>
     <script src="dist.js"></script>
