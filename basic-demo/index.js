@@ -10,7 +10,7 @@ const low = 2125;
 const high = 2295;
 const SHIFT = 1000;
 let lastTime = 0;
-
+let debugging = '';
 function getNumberOfPaddingBits(bitsPerSecond) {
   return Math.ceil(bitsPerSecond / 2) + 2;
 }
@@ -146,6 +146,7 @@ function run(b, message, paint, noisy, plexers) {
   processor.onaudioprocess = function(e) {
     let processData = e.inputBuffer.getChannelData(0);
     remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
+    debugging += Array.prototype.slice.call(processData, 0).join(',');
 
     out.forEach((v, i, arr) => {
       let k = 0.5 + (binsPerBit * (high + (i % oscillators.length) * SHIFT) / SAMPLE_RATE);
@@ -187,6 +188,7 @@ function run(b, message, paint, noisy, plexers) {
   lastTime = data.length * length;
 
   oscillators[0].onended = () => {
+    console.log(debugging);
     oscillators.forEach((osc) => {
       osc.disconnect(processor);
       osc.disconnect(context.destination);
