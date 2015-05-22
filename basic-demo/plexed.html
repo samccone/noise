@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <style>
+      textarea {
+        display: block;
+        font-size: 20px;
+        width: 90%;
+        padding: 10px;
+        margin: 0 auto;
+      }
+      .reload {
+        font-size: 60px;
+        font-weight: bold;
+        position: absolute;
+        bottom: 0;
+        right: 10px;
+        color: #CCC;
+      }
+      button {
+        display: block;
+        padding: 10px;
+        margin: 20px auto;
+        font-size: 25px;
+      }
+    input {
+      display: block;
+      font-size: 20px;
+      margin: 0 auto;
+    }
+    .close {position: absolute; bottom: 10px; left: 10px; font-size: 20px; opacity: 0.5}
+      * { padding: 0; margin: 0; }
+      canvas {display: block; margin: 0 auto; width: 100%; max-width: 1024px;}
+    </style>
+  </head>
+  <body>
+    <div class='demo'>
+      <textarea id='input'> Multiplex!!! </textarea>
+      <textarea id='output'>....</textarea>
+      <input type="number" id='baud' value="300">
+      <input type="number" id='plexers' value="2">
+      <button id='run-demo' onClick='noise.run(parseInt(document.querySelector("#baud").value), null, null, false, parseInt(document.querySelector("#plexers").value))'>Run it!</button>
+      <canvas width='600' height='125'></canvas>
+    </div>
+    <script src="dist.js"></script>
+    <div class="close" onClick="window.location='https://samccone.github.io/noise/blank.html'">&#x2717;</div>
+    <div class="reload" onClick="window.location=window.location">&#x21bb;</div>
+  </body>
+</html>
