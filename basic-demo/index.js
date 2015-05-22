@@ -22,7 +22,7 @@ function classifyBit(v, baud) {
 
 function decode(out, baud) {
   let unmap = out.map((v) => classifyBit(v, baud));
-  let unpadded = unpadSignal(unmap, baud);
+  let unpadded = unpadSignal(unmap);
   let output = document.querySelector('#output');
 
   if (output) {
@@ -30,19 +30,40 @@ function decode(out, baud) {
   }
 }
 
-function unpadSignal(bits, bitsPerSecond) {
-  bits = bits.slice(getNumberOfPaddingBits(bitsPerSecond));
-  return bits.slice(0, -getNumberOfPaddingBits(bitsPerSecond));
+function unpadSignal(bits) {
+  while (bits[0] === 0) {
+    bits.shift();
+  }
+
+  while (bits[0] === 1) {
+    bits.shift();
+  }
+
+  bits.shift();
+  bits.shift();
+
+  while (bits[bits.length - 1] === 0) {
+    bits.pop();
+  }
+
+  while (bits[ bits.length - 1 ] === 1) {
+    bits.pop();
+  }
+
+  bits.pop();
+  bits.pop();
+
+  return bits;
 }
 
 function padSignal(bits, bitsPerSecond) {
-  let padBits = '';
+  var padBits = '';
 
-  for (let i = 0; i < getNumberOfPaddingBits(bitsPerSecond); ++i) {
+  for (var i = 0; i < getNumberOfPaddingBits(bitsPerSecond); ++i) {
     padBits += i < getNumberOfPaddingBits(bitsPerSecond) - 2 ? '1' : 0;
   }
 
-  return padBits + bits + padBits;
+  return padBits + bits + Array.prototype.reverse.apply(padBits).toString();
 }
 
 function hamming(n, N) {
@@ -188,7 +209,6 @@ function run(b, message, paint, noisy, plexers) {
   lastTime = data.length * length;
 
   oscillators[0].onended = () => {
-    console.log(debugging);
     oscillators.forEach((osc) => {
       osc.disconnect(processor);
       osc.disconnect(context.destination);
