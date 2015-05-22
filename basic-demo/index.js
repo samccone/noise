@@ -88,7 +88,7 @@ function paintOutput(out, baud) {
   const ctx = canvas.getContext('2d');
   const width = canvas.width;
   const height = canvas.height;
-  let normalized = out.map(v => v.m);
+  let normalized = out.map(v => v.m).filter(v => v != -Infinity && v != Infinity);
   const max = _.max(normalized);
   const min = _.min(normalized);
 
