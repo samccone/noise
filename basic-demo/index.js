@@ -11,6 +11,7 @@ const high = 2295;
 const SHIFT = 1000;
 let lastTime = 0;
 let debugging = '';
+
 function getNumberOfPaddingBits(bitsPerSecond) {
   return Math.ceil(bitsPerSecond / 2) + 2;
 }
@@ -164,7 +165,7 @@ function run(b, message, paint, noisy, plexers) {
 
   processor.connect(context.destination);
 
-  processor.onaudioprocess = function(e) {
+  processor.onaudioprocess = (e) => {
     let processData = e.inputBuffer.getChannelData(0);
     remainder = remainder.concat(Array.prototype.slice.call(processData, 0));
     debugging += Array.prototype.slice.call(processData, 0).join(',');
