@@ -11,4 +11,4 @@
 * [Graphing Frequency Intensity](http://samccone.github.io/noise/basic-demo/graph.html)
 * [A Working Modem Implementation](http://samccone.github.io/noise/basic-demo/everything.html)
 * [Dealing with Signal Noise](http://samccone.github.io/noise/basic-demo/noise.html)
-
+* [Multiplexed Transmissions](http://samccone.github.io/noise/basic-demo/plexed.html)
