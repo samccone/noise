@@ -1,0 +1,119 @@
+<html>
+  <head>
+    <style>
+      * {
+        margin: 0;
+        padding:0;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-rendering: geometricPrecision;
+      }
+
+      #connection {
+        height: 275px;
+        width: 420px;
+        border: solid 1px black;
+        background: #fffff7;
+        text-align: center;
+      }
+      #connect {
+        margin: 0 auto;
+        width: 98px;
+        height: 20px;
+        border: solid 1px black;
+        background: #006bac;
+        color: #fffdff;
+        font-weight: bold;
+        font-family: arial;
+        font-size: 12px;
+        text-align: center;
+        line-height: 20px;
+        box-shadow: 5px 6px #ada3a4;
+        cursor: pointer;
+      }
+      .connecting {
+        opacity: 0.5;
+      }
+
+      ul {
+        width: 95%;
+        height: 142px;
+        text-align: center;
+        margin: 10px auto -10px;
+      }
+
+      li {
+        display: inline-block;
+        width : 30%;
+        border: solid 3px #003362;
+        background: #cecfff;
+        height: 73%;
+      }
+
+      #connection > ul.one > li:nth-child(1) {
+        background: #cecfff url('one.png') center center no-repeat;
+        background-size: 60%;
+      }
+
+      #connection > ul.two > li:nth-child(2) {
+        background: #cecfff url('two.png') center center no-repeat;
+        background-size: 80%;
+      }
+
+      #connection > ul.three > li:nth-child(3) {
+        background: #cecfff url('three.png') center center no-repeat;
+        background-size: 90%;
+     }
+      #header span {
+        background: rgb(204, 204, 204);
+        padding: 0 10px;
+      }
+
+      #header {
+        background: #cecece url('menu.png');
+        border: solid 1px #fffff7;
+        border-bottom: solid 1px #000;
+        font-family: monospace;
+        font-weight: bold;
+        text-rendering: geometricPrecision;
+        font-size: 11px;
+        background-size: 4px;
+        background-repeat: repeat-x;
+        background-position: center top;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='connection'>
+      <div id="header"><span>Connect to America Online</span></div>
+      <img src="logo.png" height="80px" alt="logo">
+      <ul class='connect-list'>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+      <div id='connect' onClick='connect()'>Connect</div>
+    </div>
+    <script>
+      function connect() {
+        var elm = document.querySelector('#connect');
+
+        elm.classList.add('connecting');
+        elm.innerHTML = 'Connecting..';
+
+        (new Audio('dialup.mp3')).play();
+
+        setTimeout(function() {
+          (document.querySelector('.connect-list')).classList.add('two');
+        }, 1000 * 10);
+        setTimeout(function() {
+          (document.querySelector('.connect-list')).classList.add('three');
+        }, 1000 * 20);
+        (document.querySelector('.connect-list')).classList.add('one');
+      }
+    </script>
+  </body>
+</html>
