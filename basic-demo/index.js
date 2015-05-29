@@ -64,7 +64,7 @@ function padSignal(bits, bitsPerSecond) {
     padBits += i < getNumberOfPaddingBits(bitsPerSecond) - 2 ? '1' : 0;
   }
 
-  return padBits + bits + Array.prototype.reverse.apply(padBits).toString();
+  return padBits + bits + padBits.split('').reverse().join('');
 }
 
 function hamming(n, N) {
