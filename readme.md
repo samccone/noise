@@ -4,6 +4,10 @@
 
 ![](https://s3.amazonaws.com/media-p.slid.es/uploads/305782/images/1300227/modem.png)
 
+
+View the Deck here
+[http://slides.com/samccone/jsconf-us](http://slides.com/samccone/jsconf-us)
+
 ##### Demos
 
 * [Encoding Data to Binary](http://samccone.github.io/noise/component-demos/string-to-binary.html)
