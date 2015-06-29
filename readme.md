@@ -2,11 +2,15 @@
 
 #### Experiments with dial up modems in javascript.
 
-![](https://s3.amazonaws.com/media-p.slid.es/uploads/305782/images/1300227/modem.png)
-
+View the talk here
+[https://www.youtube.com/watch?v=UKa20yPzGbU](https://www.youtube.com/watch?v=UKa20yPzGbU)
 
 View the Deck here
 [http://slides.com/samccone/jsconf-us](http://slides.com/samccone/jsconf-us)
+
+-----------
+
+![](https://s3.amazonaws.com/media-p.slid.es/uploads/305782/images/1300227/modem.png)
 
 ##### Demos
 
